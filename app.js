@@ -14,7 +14,7 @@ var helpers = require("./views/helpers");
 var routes = require('./routes/index');
 var room = require('./routes/room');
 
-//api
+// api
 var usersApi = require('./routes/api/v1/users');
 
 var app = express();
@@ -23,7 +23,7 @@ var io = require('socket.io')(server);
 
 var keyMirror = require('keymirror');
 
-EVENTS = keyMirror({
+var EVENTS = keyMirror({
   PLAYER_JOINED: "playerJoined",
   PLAYER_LEFT: "playerLeft",
   MESSAGE_RECEIVED: "messageReceived",
@@ -53,7 +53,7 @@ app.use(session({
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(favicon(__dirname + '/public/favicon.png'));
 
-//socket.io middleware
+// socket.io middleware
 app.use(function(req, res, next) {
   res.io = io;
   next();
@@ -62,7 +62,7 @@ app.use(function(req, res, next) {
 app.use('/', routes);
 app.use('/room', room);
 
-//api
+// api
 app.use('/api/users', usersApi);
 
 // catch 404 and forward to error handler
@@ -101,13 +101,16 @@ io.sockets.on('connection', function (socket) {
   });
 });
 
-// --- AZAANBALL SERVER LISTENER ---
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log('------------------------------------');
-  console.log('AZAANBALL HUB IS ACTIVE');
-  console.log('Running on Port: ' + PORT);
-  console.log('------------------------------------');
-});
+// --- FINAL RENDER-READY LISTENER ---
+// We check if this is the main module to prevent "Double Listen" errors
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  server.listen(PORT, () => {
+    console.log('------------------------------------');
+    console.log('AZAANBALL HUB IS ACTIVE');
+    console.log('Running on Port: ' + PORT);
+    console.log('------------------------------------');
+  });
+}
 
 module.exports = {app: app, server: server};
